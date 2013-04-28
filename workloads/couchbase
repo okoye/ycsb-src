@@ -1,0 +1,31 @@
+# WSGC Benchmark Parameters
+#                        
+#   Read/update ratio: 90/10
+#   Default data size: 1 KB records (10 fields, 100 bytes each, plus key)
+#   Request distribution: uniform
+
+recordcount=500000000
+operationcount=500000
+
+fieldlength=100
+fieldcount=10
+
+workload=com.yahoo.ycsb.workloads.CoreWorkload
+readallfields=true
+
+readproportion=0.9
+updateproportion=0
+scanproportion=0
+insertproportion=0.1
+
+requestdistribution=uniform
+
+threadcount=100
+target=1000
+
+#couchbase specific settings
+couchbase.hosts=192.168.1.15
+couchbase.user=Administrator
+couchbase.password=nothing
+table=ut
+db=com.yahoo.ycsb.couchbase.CouchbaseClient2_0
