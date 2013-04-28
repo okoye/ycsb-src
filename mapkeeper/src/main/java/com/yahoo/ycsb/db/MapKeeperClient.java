@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
+import java.lang.Boolean;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -52,7 +53,7 @@ public class MapKeeperClient extends DB {
             throw new RuntimeException(e);
         }
         writeallfields = Boolean.parseBoolean(getProperties().getProperty(CoreWorkload.WRITE_ALL_FIELDS_PROPERTY, 
-                    CoreWorkload.WRITE_ALL_FIELDS_PROPERTY_DEFAULT));
+                    boolToString(CoreWorkload.WRITE_ALL_FIELDS_PROPERTY_DEFAULT)));
     }
 
     ByteBuffer encode(HashMap<String, ByteIterator> values) {
@@ -108,6 +109,13 @@ public class MapKeeperClient extends DB {
     }
     String strResponse(BinaryResponse buf) {
         return new String(buf.value.array());
+    }
+    
+    String boolToString(boolean b){
+    	if (b){
+    		return "true";
+    	}
+    	return "false";
     }
 
     @Override

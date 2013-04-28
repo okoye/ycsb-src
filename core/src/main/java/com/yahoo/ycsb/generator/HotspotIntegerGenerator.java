@@ -33,12 +33,12 @@ import com.yahoo.ycsb.Utils;
  */
 public class HotspotIntegerGenerator extends IntegerGenerator {
 
-  private final int lowerBound;
-  private final int upperBound;
-  private final int hotInterval;
-  private final int coldInterval;
-  private final double hotsetFraction;
-  private final double hotOpnFraction;
+  protected final int lowerBound;
+  protected final int upperBound;
+  protected final int hotInterval;
+  protected final int coldInterval;
+  protected final double hotsetFraction;
+  protected final double hotOpnFraction;
   
   /**
    * Create a generator for Hotspot distributions.

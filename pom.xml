@@ -56,6 +56,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <thrift.version>0.8.0</thrift.version>
     <hypertable.version>0.9.5.6</hypertable.version>
+    <memcached.version>1.0</memcached.version>
+    <couchbase.version>2.0</couchbase.version>
   </properties>
 
   <modules>
@@ -76,6 +78,8 @@
     <module>redis</module>
     <module>voldemort</module>
     <module>distribution</module>
+    <module>memcached</module>
+    <module>couchbase2</module>
   </modules>
 
   <build>

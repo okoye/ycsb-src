@@ -22,7 +22,7 @@ package com.yahoo.ycsb.generator;
  */
 public class SkewedLatestGenerator extends IntegerGenerator
 {
-	CounterGenerator _basis;
+	IntegerGenerator _basis;
 	ZipfianGenerator _zipfian;
 
 	public SkewedLatestGenerator(CounterGenerator basis)
