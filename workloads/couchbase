@@ -24,7 +24,7 @@ threadcount=100
 target=1000
 
 #couchbase specific settings
-couchbase.hosts=192.168.1.15
+couchbase.hosts=54.215.3.31,54.215.3.34,54.215.3.35,54.215.3.38
 couchbase.user=Administrator
 couchbase.password=nothing
 table=ut

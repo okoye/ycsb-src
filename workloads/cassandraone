@@ -19,7 +19,7 @@ scanproportion=0
 insertproportion=0.1
 
 requestdistribution=uniform
-hosts=192.168.1.15
+hosts=54.215.3.31,54.215.3.34,54.215.3.35,54.215.3.38
 
 threadcount=100
 #TODO vary from 1000 to 10000
