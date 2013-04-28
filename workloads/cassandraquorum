@@ -22,7 +22,8 @@ requestdistribution=uniform
 hosts=192.168.1.15
 
 threadcount=100
-target=1000 #TODO: change to 10000
+#vary to 10000
+target=1000 
 
 #cassandra specific settings
 #ONE, QUORUM, ALL, ANY

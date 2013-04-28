@@ -4,7 +4,7 @@
 #   Default data size: 1 KB records (10 fields, 100 bytes each, plus key)
 #   Request distribution: uniform
 
-recordcount=500000000
+recordcount=2000000
 operationcount=500000
 
 fieldlength=100
@@ -22,7 +22,8 @@ requestdistribution=uniform
 hosts=192.168.1.15
 
 threadcount=100
-target=1000 #TODO: change to 10000
+#TODO vary from 1000 to 10000
+target=1000
 
 #cassandra specific settings
 #ONE, QUORUM, ALL, ANY
