@@ -24,6 +24,6 @@ threadcount=100
 target=1000
 
 #couchbase specific settings
-couchbase.hosts=queenbee
+couchbase.hosts=54.217.242.215,54.217.242.218,54.217.242.228,54.217.242.231
 couchbase.checkOperationStatus=true
 db=com.yahoo.ycsb.couchbase.CouchbaseClient2_0
