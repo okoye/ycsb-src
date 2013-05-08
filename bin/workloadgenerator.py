@@ -10,13 +10,15 @@ import math
 
 
 def generate_configuration(options):
-  record_count = options.rc
-  operation_count = options.oc
-  insert_count = options.ic
+  record_count = int(options.rc)
+  operation_count = int(options.oc)
+  insert_count = int(options.ic)
   hosts = options.h
   thread_count = options.tc
   template_dir = options.template
   output_file = options.output
+
+  assert(record_count >= insert_count)
 
   #read template file for processing
   template = ''.join([line for line in open(template_dir)])
@@ -47,7 +49,9 @@ def generate_configuration(options):
     }
     
     result = pystache.render(template, context)
-    print result
+    filename = ''.join([output_file, '_', '%s'%i])
+    f = open(filename, 'w')
+    f.write(result)
 
 ###################Start######################
 if __name__ == '__main__':
