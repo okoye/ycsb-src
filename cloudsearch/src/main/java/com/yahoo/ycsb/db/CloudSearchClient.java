@@ -1,8 +1,17 @@
 package com.yahoo.ycsb.db;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+
+import org.json.simple.JSONObject;
+
 import com.yahoo.ycsb.ByteIterator;
 import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
@@ -13,6 +22,7 @@ import com.amazonaws.services.cloudsearchv2.AmazonCloudSearch;
 import com.amazonaws.services.cloudsearchdomain.AmazonCloudSearchDomain;
 import com.amazonaws.services.cloudsearchv2.AmazonCloudSearchClient;
 import com.amazonaws.services.cloudsearchdomain.AmazonCloudSearchDomainClient;
+import com.amazonaws.services.cloudsearchdomain.model.UploadDocumentsRequest;
 
 /**
  *	CloudSearch client for YCSB
@@ -24,7 +34,7 @@ public class CloudSearchClient extends DB {
 	private AmazonCloudSearch configClient = null; //Configuration Service
 	private AmazonCloudSearchDomain searchClient = null; //Search and Doc Service
 	private AWSCredentials credentials = null; 
-	private CloudSearchConfig csConfig;
+	private CloudSearchConfig csConfig = null;
 	
 	/**
 	 * Are the necessary credentials available in our config file
@@ -57,11 +67,13 @@ public class CloudSearchClient extends DB {
     		searchClient = new AmazonCloudSearchDomainClient();
     	}
     	configClient.setEndpoint(csConfig.getCloudSearchEndpoint());
+    	searchClient.setEndpoint(csConfig.getCloudSearchEndpoint());
     }
 
     @Override
     public void cleanup() throws DBException {
-        //No cleanup tasks necessary.
+        configClient.shutdown();
+        searchClient.shutdown();
     }
 
     /**
@@ -76,10 +88,40 @@ public class CloudSearchClient extends DB {
      * description for a discussion of error codes.
      */
     @Override
-    public int insert(String table, String key, HashMap<String, ByteIterator> values) {
-        return 1;
+    public int insert(String table, String key, HashMap<String, ByteIterator> values){
+    	ByteArrayOutputStream b;
+    	ObjectOutputStream o;
+    	ArrayList<JSONObject> generatedDocCache = new ArrayList<JSONObject>();
+    	ArrayList<String> entryValues = new ArrayList<String>();
+    	JSONObject doc = new JSONObject();
+		doc.put("table", table);
+		doc.put("key", key);
+    	for(Entry<String, String>entry: StringByteIterator.getStringMap(values).entrySet()){
+    		entryValues.add(entry.getValue());
+    	}
+    	doc.put("values", entryValues.toArray());
+    	
+    	try{
+    		b = new ByteArrayOutputStream();
+    		o = new ObjectOutputStream(b);
+    		o.writeObject(doc);
+    	}
+    	catch(IOException io){
+    		System.err.println("ERROR: Failed when creating outputstreams in insert");
+    		return 0;
+    	}
+    	try{
+    		UploadDocumentsRequest req = new UploadDocumentsRequest();
+        	req.setDocuments(new ByteArrayInputStream(b.toByteArray()));
+        	searchClient.uploadDocuments(req);
+    	}
+    	catch(Exception ex){
+    		System.err.println("ERROR: An error occured when uploading documents");
+    		return 1;
+    	}
+    	return 0;
     }
-
+    
     /**
      * Delete a record from the database.
      *
@@ -90,7 +132,7 @@ public class CloudSearchClient extends DB {
      */
     @Override
     public int delete(String table, String key) {
-        return 1;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -139,34 +181,6 @@ public class CloudSearchClient extends DB {
      */
     @Override
     public int scan(String table, String startkey, int recordcount, Set<String> fields, Vector<HashMap<String, ByteIterator>> result) {
-        return 1;
+        throw new UnsupportedOperationException();
     }
-
-	@Override
-	public int read(String table, String key, Set<String> fields,
-			HashMap<String, ByteIterator> result) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int scan(String table, String startkey, int recordcount,
-			Set<String> fields, Vector<HashMap<String, ByteIterator>> result) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int update(String table, String key,
-			HashMap<String, ByteIterator> values) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int insert(String table, String key,
-			HashMap<String, ByteIterator> values) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }
