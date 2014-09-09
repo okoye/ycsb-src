@@ -118,8 +118,14 @@ public class CloudSearchClient extends DB {
         	req.setDocuments(new ByteArrayInputStream(b.toByteArray()));
         	searchClient.uploadDocuments(req);
     	}
+    	catch(AmazonClientException ace){
+    		System.err.println("An error occured when uploading documents for indexing");
+    		System.err.println(ace);
+    		return 1;
+    	}
     	catch(Exception ex){
     		System.err.println("ERROR: An error occured when uploading documents");
+    		System.err.println(ex);
     		return 1;
     	}
     	return 0;
