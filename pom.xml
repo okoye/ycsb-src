@@ -80,7 +80,7 @@
     <module>distribution</module>
     <module>memcached</module>
     <module>couchbase2</module>
-    <module>aerospike</module>
+    <!--module>aerospike</module-->
   </modules>
 
   <build>

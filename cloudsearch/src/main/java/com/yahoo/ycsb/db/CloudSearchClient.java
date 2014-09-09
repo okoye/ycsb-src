@@ -7,8 +7,12 @@ import com.yahoo.ycsb.ByteIterator;
 import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
 import com.yahoo.ycsb.StringByteIterator;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.cloudsearchv2.AmazonCloudSearch;
+import com.amazonaws.services.cloudsearchdomain.AmazonCloudSearchDomain;
 import com.amazonaws.services.cloudsearchv2.AmazonCloudSearchClient;
+import com.amazonaws.services.cloudsearchdomain.AmazonCloudSearchDomainClient;
 
 /**
  *	CloudSearch client for YCSB
@@ -17,18 +21,24 @@ import com.amazonaws.services.cloudsearchv2.AmazonCloudSearchClient;
  */
 public class CloudSearchClient extends DB {
 
-	private AmazonCloudSearch csClient = null;
+	private AmazonCloudSearch configClient = null; //Configuration Service
+	private AmazonCloudSearchDomain searchClient = null; //Search and Doc Service
+	private AWSCredentials credentials = null; 
 	private CloudSearchConfig csConfig;
 	
 	/**
 	 * Are the necessary credentials available in our config file
+	 * if yes, instantiate the credentials object.
 	 * @return true if credentials were supplied in config file
 	 */
 	private boolean haveCredentials(){
-		if (csConfig.getAccessKeyId() != null && csConfig.getSecretKeyId() != null)
+		if (csConfig.getAccessKeyId() != null && csConfig.getSecretKeyId() != null){
+			credentials = new BasicAWSCredentials(csConfig.getAccessKeyId(), csConfig.getSecretKeyId());
 			return true;
-		else
+		}
+		else{
 			return false;
+		}
 	}
 	
     /**
@@ -38,14 +48,20 @@ public class CloudSearchClient extends DB {
     @Override
     public void init() throws DBException {
     	csConfig = new CloudSearchConfig(getProperties());
-    	if (haveCredentials()){
-    		csConfig = new AmazonCloudSearch
+    	if (haveCredentials()){ //otherwise assume creds in env vars
+    		configClient = new AmazonCloudSearchClient(credentials);
+    		searchClient = new AmazonCloudSearchDomainClient(credentials);
     	}
+    	else{
+    		configClient = new AmazonCloudSearchClient();
+    		searchClient = new AmazonCloudSearchDomainClient();
+    	}
+    	configClient.setEndpoint(csConfig.getCloudSearchEndpoint());
     }
 
     @Override
     public void cleanup() throws DBException {
-        
+        //No cleanup tasks necessary.
     }
 
     /**

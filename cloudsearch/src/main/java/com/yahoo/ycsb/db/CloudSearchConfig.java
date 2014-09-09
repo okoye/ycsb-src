@@ -5,9 +5,14 @@ import java.util.Properties;
 
 public class CloudSearchConfig extends PropertiesConfig{
 
+	//Search endpoint for your search domain
 	public static final String SEARCH_ENDPOINT = "cloudsearch.searchEndpoint";
 	
+	//Doc endpoint for your search domain
 	public static final String DOC_ENDPOINT = "cloudsearch.docEndpoint";
+	
+	//Full URL pointing the the cloudsearch endpoint  e.g https://cloudsearch.us-east-1.amazonaws.com/
+	public static final String CLOUDSEARCH_ENDPOINT = "cloudsearch.endpoint";
 	
 	public static final String AWS_ACCESS_KEY_ID = "aws.accessKeyId";
 	
@@ -17,6 +22,7 @@ public class CloudSearchConfig extends PropertiesConfig{
 		super(properties);
 		declareProperty(SEARCH_ENDPOINT, true);
 		declareProperty(DOC_ENDPOINT, true);
+		declareProperty(CLOUDSEARCH_ENDPOINT, true);
 		declareProperty(AWS_ACCESS_KEY_ID, null, false);
 		declareProperty(AWS_SECRET_ACCESS_KEY, null, false);
 	}
@@ -27,6 +33,10 @@ public class CloudSearchConfig extends PropertiesConfig{
 	
 	public String getDocEndpoint(){
 		return getString(DOC_ENDPOINT);
+	}
+	
+	public String getCloudSearchEndpoint(){
+		return getString(CLOUDSEARCH_ENDPOINT);
 	}
 	
 	public String getAccessKeyId(){
