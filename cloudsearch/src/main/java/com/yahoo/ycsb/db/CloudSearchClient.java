@@ -16,13 +16,16 @@ import com.yahoo.ycsb.ByteIterator;
 import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
 import com.yahoo.ycsb.StringByteIterator;
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.cloudsearchv2.AmazonCloudSearch;
 import com.amazonaws.services.cloudsearchdomain.AmazonCloudSearchDomain;
 import com.amazonaws.services.cloudsearchv2.AmazonCloudSearchClient;
 import com.amazonaws.services.cloudsearchdomain.AmazonCloudSearchDomainClient;
+import com.amazonaws.services.cloudsearchdomain.model.SearchResult;
 import com.amazonaws.services.cloudsearchdomain.model.UploadDocumentsRequest;
+import com.amazonaws.services.cloudsearchdomain.model.SearchRequest;
 
 /**
  *	CloudSearch client for YCSB
@@ -147,7 +150,30 @@ public class CloudSearchClient extends DB {
      */
     @Override
     public int read(String table, String key, Set<String> fields, HashMap<String, ByteIterator> result) {
-        return 1;
+        //All read should do is simple conduct a search and see if it is successful or not.
+    	//If successful code, return 0, otherwise return 1.
+    	
+    	//First, build a SearchRequest object
+    	SearchResult searchResult;
+    	SearchRequest searchRequest = new SearchRequest();
+    	
+    	String query = String.format("(and table: '%s' key: '%s')", table, key);
+    	searchRequest.setQuery(query);
+    	searchRequest.setQueryParser("structured");
+    	try{
+    		searchResult = searchClient.search(searchRequest); //we dont care about returned results
+    	}
+    	catch(AmazonClientException ace){
+    		System.err.println("An error occured when searching/reading results from cloudsearch");
+    		System.err.println(ace.toString());
+    		return 1;
+    	}
+    	catch(Exception ex){
+    		System.err.println("An unknown error occured when searching/reading results from cloudsearch");
+    		System.err.println(ex.toString());
+    		return 1;
+    	}
+    	return 0;
     }
 
     /**
@@ -163,7 +189,7 @@ public class CloudSearchClient extends DB {
      */
     @Override
     public int update(String table, String key, HashMap<String, ByteIterator> values) {
-        return 1;
+    	return this.insert(table, key, values);
     }
 
     /**
