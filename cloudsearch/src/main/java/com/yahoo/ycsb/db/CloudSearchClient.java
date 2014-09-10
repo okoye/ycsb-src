@@ -55,8 +55,8 @@ public class CloudSearchClient extends DB {
 	}
 	
     /**
-     * Initialize any state for this DB. Called once per DB instance; there is
-     * one DB instance per client thread.
+     * Initialize any state for this CloudSearch client instance. 
+     * Called once per DB instance; there is one DB instance per client thread.
      */
     @Override
     public void init() throws DBException {
@@ -70,7 +70,7 @@ public class CloudSearchClient extends DB {
     		searchClient = new AmazonCloudSearchDomainClient();
     	}
     	configClient.setEndpoint(csConfig.getCloudSearchEndpoint());
-    	searchClient.setEndpoint(csConfig.getCloudSearchEndpoint());
+    	searchClient.setEndpoint(csConfig.getDocEndpoint());
     }
 
     @Override
@@ -115,6 +115,7 @@ public class CloudSearchClient extends DB {
     	}
     	try{
     		UploadDocumentsRequest req = new UploadDocumentsRequest();
+    		System.out.println(req);
         	req.setDocuments(new ByteArrayInputStream(b.toByteArray()));
         	searchClient.uploadDocuments(req);
     	}
@@ -132,7 +133,7 @@ public class CloudSearchClient extends DB {
     }
     
     /**
-     * Delete a record from the database.
+     * Delete a record from the CloudSearch Domain.
      *
      * @param table The name of the table
      * @param key The record key of the record to delete.
@@ -145,8 +146,8 @@ public class CloudSearchClient extends DB {
     }
 
     /**
-     * Read a record from the database. Each field/value pair from the result
-     * will be stored in a HashMap.
+     * Read a record from CloudSearch. We only use the table name and key when
+     * conducting search queries.
      *
      * @param table The name of the table
      * @param key The record key of the record to read.
@@ -183,7 +184,7 @@ public class CloudSearchClient extends DB {
     }
 
     /**
-     * Update a record in the database. Any field/value pairs in the specified
+     * Update a record in the CloudSearch domain. Any field/value pairs in the specified
      * values HashMap will be written into the record with the specified record
      * key, overwriting any existing values with the same field name.
      *
@@ -199,8 +200,7 @@ public class CloudSearchClient extends DB {
     }
 
     /**
-     * Perform a range scan for a set of records in the database. Each
-     * field/value pair from the result will be stored in a HashMap.
+     * RangeOperations are currently unsupported and have no real equivalent for searching.
      *
      * @param table The name of the table
      * @param startkey The record key of the first record to read.

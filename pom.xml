@@ -61,25 +61,25 @@
   </properties>
 
   <modules>
-    <!--module>build-tools</module-->
-    <module>cassandra</module>
+    <!--module>build-tools</module
+    <module>cassandra</module> -->
     <module>core</module>
-    <module>hbase</module>
+    <!--module>hbase</module>
     <module>hypertable</module>
     <module>dynamodb</module>
     <module>elasticsearch</module>
-    <!--<module>gemfire</module>-->
+    <module>gemfire</module>
     <module>infinispan</module>
     <module>jdbc</module>
-    <!--module>mapkeeper</module-->
+    <module>mapkeeper</module>
     <module>mongodb</module>
     <module>orientdb</module>
-    <!--module>nosqldb</module-->
+    <module>nosqldb</module>
     <module>redis</module>
     <module>voldemort</module>
     <module>distribution</module>
     <module>memcached</module>
-    <module>couchbase2</module>
+    <module>couchbase2</module> -->
     <module>cloudsearch</module>
     <!--module>aerospike</module-->
   </modules>
