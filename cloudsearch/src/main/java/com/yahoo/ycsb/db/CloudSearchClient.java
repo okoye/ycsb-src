@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,8 +37,8 @@ import com.amazonaws.services.cloudsearchdomain.model.SearchRequest;
  */
 public class CloudSearchClient extends DB {
 
-	private AmazonCloudSearch configClient = null; //Configuration Service
-	private AmazonCloudSearchDomain searchClient = null; //Search and Doc Service
+	private AmazonCloudSearchDomain searchClient = null; //Search client for search endpoint
+	private AmazonCloudSearchDomain docClient = null; //Doc client for doc endpoint 
 	private AWSCredentials credentials = null; 
 	private CloudSearchConfig csConfig = null;
 	
@@ -54,6 +57,10 @@ public class CloudSearchClient extends DB {
 		}
 	}
 	
+	private String constructId(String table, String key){
+		return table + "." + key + "." + System.currentTimeMillis();
+	}
+	
     /**
      * Initialize any state for this CloudSearch client instance. 
      * Called once per DB instance; there is one DB instance per client thread.
@@ -62,21 +69,21 @@ public class CloudSearchClient extends DB {
     public void init() throws DBException {
     	csConfig = new CloudSearchConfig(getProperties());
     	if (haveCredentials()){ //otherwise assume creds in env vars
-    		configClient = new AmazonCloudSearchClient(credentials);
     		searchClient = new AmazonCloudSearchDomainClient(credentials);
+    		docClient = new AmazonCloudSearchDomainClient(credentials);
     	}
     	else{
-    		configClient = new AmazonCloudSearchClient();
     		searchClient = new AmazonCloudSearchDomainClient();
+    		docClient = new AmazonCloudSearchDomainClient();
     	}
-    	configClient.setEndpoint(csConfig.getCloudSearchEndpoint());
-    	searchClient.setEndpoint(csConfig.getDocEndpoint());
+    	searchClient.setEndpoint(csConfig.getSearchEndpoint());
+    	docClient.setEndpoint(csConfig.getDocEndpoint());
     }
 
     @Override
     public void cleanup() throws DBException {
-        configClient.shutdown();
         searchClient.shutdown();
+        docClient.shutdown();
     }
 
     /**
@@ -92,43 +99,61 @@ public class CloudSearchClient extends DB {
      */
     @Override
     public int insert(String table, String key, HashMap<String, ByteIterator> values){
-    	ByteArrayOutputStream b;
-    	ObjectOutputStream o;
-    	ArrayList<JSONObject> generatedDocCache = new ArrayList<JSONObject>();
-    	ArrayList<String> entryValues = new ArrayList<String>();
-    	JSONObject doc = new JSONObject();
-		doc.put("table", table);
-		doc.put("key", key);
-    	for(Entry<String, String>entry: StringByteIterator.getStringMap(values).entrySet()){
-    		entryValues.add(entry.getValue());
-    	}
-    	doc.put("values", entryValues.toArray());
-    	
-    	try{
-    		b = new ByteArrayOutputStream();
-    		o = new ObjectOutputStream(b);
-    		o.writeObject(doc);
-    	}
-    	catch(IOException io){
-    		System.err.println("ERROR: Failed when creating outputstreams in insert");
-    		return 0;
-    	}
-    	try{
-    		UploadDocumentsRequest req = new UploadDocumentsRequest();
-    		System.out.println(req);
-        	req.setDocuments(new ByteArrayInputStream(b.toByteArray()));
-        	searchClient.uploadDocuments(req);
-    	}
-    	catch(AmazonClientException ace){
-    		System.err.println("An error occured when uploading documents for indexing");
-    		System.err.println(ace);
-    		return 1;
-    	}
-    	catch(Exception ex){
-    		System.err.println("ERROR: An error occured when uploading documents");
-    		System.err.println(ex);
-    		return 1;
-    	}
+//    	ByteArrayOutputStream b;
+//    	ObjectOutputStream o;
+//    	ArrayList<JSONObject> generatedDocCache = new ArrayList<JSONObject>();
+//    	ArrayList<String> entryValues = new ArrayList<String>();
+//    	JSONObject doc = new JSONObject();
+//    	HashMap<String, Object> fields = new HashMap<String, Object>();
+//		fields.put("table", table);
+//		fields.put("key", key);
+//    	for(Entry<String, String>entry: StringByteIterator.getStringMap(values).entrySet()){
+//    		entryValues.add(entry.getValue());
+//    	}
+//    	fields.put("values", entryValues.toArray());
+//    	doc.put("id", constructId(table, key));
+//    	doc.put("type", "add");
+//    	doc.put("fields", fields);
+//    	
+//    	try{
+//    		b = new ByteArrayOutputStream();
+//    		o = new ObjectOutputStream(b);
+//    		o.writeObject(doc);
+//    	}
+//    	catch(IOException io){
+//    		System.err.println("ERROR: Failed when creating outputstreams in insert");
+//    		return 0;
+//    	}
+//    	try{
+//    		UploadDocumentsRequest req = new UploadDocumentsRequest();
+//    		req.setContentType("application/json");
+//    		System.err.println("Size of buffer in bytes is: "+b.size());
+//    		req.setContentLength((long) b.size());
+//        	req.setDocuments(new ByteArrayInputStream(b.toByteArray()));
+//        	docClient.uploadDocuments(req);
+//    	}
+//    	catch(AmazonClientException ace){
+//    		System.err.println("An error occured when uploading documents for indexing");
+//    		System.err.println(ace);
+//    		return 1;
+//    	}
+//    	catch(Exception ex){
+//    		System.err.println("ERROR: An error occured when uploading documents");
+//    		System.err.println(ex);
+//    		return 1;
+//    	}
+    	UploadDocumentsRequest u = new UploadDocumentsRequest();
+		u.setContentType("application/json");
+
+		File docFile = new File("/tmp/movies.json");
+		try{
+			FileInputStream fis = new FileInputStream("/tmp/movies.json");
+			u.setDocuments(fis);
+			u.setContentLength(docFile.length());
+		}catch(FileNotFoundException fne){
+			System.err.println("File was not found");
+		}
+		docClient.uploadDocuments(u);
     	return 0;
     }
     
