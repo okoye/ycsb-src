@@ -43,7 +43,6 @@ DATABASES = {
     "voldemort"    : "com.yahoo.ycsb.db.VoldemortClient",
     "couchbase"    : "com.yahoo.ycsb.couchbase.CouchbaseClient2_0",
     "aerospike"    : "com.yahoo.ycsb.db.AerospikeClient",
-    "cloudsearch"  : "com.yahoo.ycsb.db.CloudSearchClient"
 }
 
 OPTIONS = {
