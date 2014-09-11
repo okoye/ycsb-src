@@ -20,12 +20,14 @@ import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
 import com.yahoo.ycsb.StringByteIterator;
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.cloudsearchv2.AmazonCloudSearch;
 import com.amazonaws.services.cloudsearchdomain.AmazonCloudSearchDomain;
 import com.amazonaws.services.cloudsearchv2.AmazonCloudSearchClient;
 import com.amazonaws.services.cloudsearchdomain.AmazonCloudSearchDomainClient;
+import com.amazonaws.services.cloudsearchdomain.model.QueryParser;
 import com.amazonaws.services.cloudsearchdomain.model.SearchResult;
 import com.amazonaws.services.cloudsearchdomain.model.UploadDocumentsRequest;
 import com.amazonaws.services.cloudsearchdomain.model.SearchRequest;
@@ -189,16 +191,18 @@ public class CloudSearchClient extends DB {
     	SearchResult searchResult;
     	SearchRequest searchRequest = new SearchRequest();
     	
-    	String query = String.format("(and table: '%s' key: '%s')", table, key);
+    	String query = "key:'hHVLZfo0a8'";
     	searchRequest.setQuery(query);
-    	searchRequest.setQueryParser("structured");
+    	searchRequest.setQueryParser(QueryParser.Structured);
     	try{
+    		//System.err.println("Sending search request to search endpoint");
     		searchResult = searchClient.search(searchRequest); //we dont care about returned results
+    		System.out.println(searchResult.getHits());
     	}
-    	catch(AmazonClientException ace){
+    	catch(AmazonServiceException ace){
     		System.err.println("An error occured when searching/reading results from cloudsearch");
     		System.err.println(ace.toString());
-    		return 1;
+    		return ace.getStatusCode();
     	}
     	catch(Exception ex){
     		System.err.println("An unknown error occured when searching/reading results from cloudsearch");

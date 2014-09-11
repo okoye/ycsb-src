@@ -4,8 +4,8 @@
 #   Default data size: 1 KB records (10 fields, 100 bytes each, plus key)
 #   Request distribution: uniform
 
-recordcount=10000000
-operationcount=500000
+recordcount=1000
+operationcount=1200
 
 fieldlength=100
 fieldcount=2
@@ -13,16 +13,14 @@ fieldcount=2
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 readallfields=true
 
-readproportion=0.9
+readproportion=1.0
 updateproportion=0
 scanproportion=0
-insertproportion=0.1
+insertproportion=0
 
 requestdistribution=uniform
-hosts=54.215.3.31,54.215.3.34,54.215.3.35,54.215.3.38
 
 threadcount=10
-#TODO vary from 1000 to 10000 for req/sec
 target=10
 
 # Cloudsearch specific settings
